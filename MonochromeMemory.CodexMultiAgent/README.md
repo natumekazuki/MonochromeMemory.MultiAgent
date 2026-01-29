@@ -21,9 +21,9 @@ Windows ネイティブ（MAUI Blazor）で動作する、CLI コーディング
 
 ```yaml
 roles:
-  - id: ashigaru1
-    name: "足軽1"
-    prompt_path: "roles/ashigaru1.md"
+  - id: agent1
+    name: "エージェント1"
+    prompt_path: "roles/agent1.md"
     enabled: true
     command:
       exec: "gemini"
@@ -34,7 +34,7 @@ roles:
 
 ## ランタイム構成
 - タスク: `runtime/queue/tasks/*.yaml`
-- 家老指示: `runtime/queue/commands/karo.yaml`
+- ディスパッチャー指示: `runtime/queue/commands/dispatcher.yaml`
 - 報告: `runtime/queue/reports/*.yaml`
 - ログ: `runtime/logs/`
 

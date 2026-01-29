@@ -1,7 +1,7 @@
 roles:
-  - id: shogun
-    name: "将軍"
-    prompt_path: "roles/shogun.md"
+  - id: orchestrator
+    name: "オーケストレーター"
+    prompt_path: "roles/orchestrator.md"
     enabled: true
     command:
       exec: "codex"
@@ -9,9 +9,9 @@ roles:
       env: {}
       cwd: "."
 
-  - id: karo
-    name: "家老"
-    prompt_path: "roles/karo.md"
+  - id: dispatcher
+    name: "ディスパッチャー"
+    prompt_path: "roles/dispatcher.md"
     enabled: true
     command:
       exec: "claude"
@@ -19,9 +19,9 @@ roles:
       env: {}
       cwd: "."
 
-  - id: ashigaru1
-    name: "足軽1"
-    prompt_path: "roles/ashigaru1.md"
+  - id: agent1
+    name: "エージェント1"
+    prompt_path: "roles/agent1.md"
     enabled: true
     command:
       exec: "gemini"

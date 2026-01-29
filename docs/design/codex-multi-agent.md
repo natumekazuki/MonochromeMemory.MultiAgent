@@ -91,15 +91,15 @@ flowchart LR
 ## スキル候補フロー（参考実装踏襲）
 ### 目的
 - スキル候補はエージェントが報告に記載する（アプリ側で自動生成しない）
-- ユーザー承認後に、家老が SKILL.md を作成して正本へ保存する
+- ユーザー承認後に、ディスパッチャーが SKILL.md を作成して正本へ保存する
 - 正本を Codex/Copilot の個人用ディレクトリへコピーする
 
 ### フロー
-1. 足軽は `runtime/queue/reports/<role>.yaml` に `skill_candidate` を記載
+1. エージェントは `runtime/queue/reports/<role>.yaml` に `skill_candidate` を記載
 2. Orchestrator が報告を収集し、UI に「候補」として表示
 3. ユーザーが承認/却下
-4. 承認時に Orchestrator が `runtime/queue/commands/karo.yaml` に「スキル作成」を指示
-5. 家老が `skills/registry/<skill-name>/SKILL.md` を作成
+4. 承認時に Orchestrator が `runtime/queue/commands/dispatcher.yaml` に「スキル作成」を指示
+5. ディスパッチャーが `skills/registry/<skill-name>/SKILL.md` を作成
 6. Orchestrator が Codex/Copilot 個人用ディレクトリへコピー
 
 ### 形式（ターゲット別）
@@ -136,7 +136,7 @@ MonochromeMemory.CodexMultiAgent/
 ├─ runtime/
 │  ├─ queue/
 │  │  ├─ tasks/             # 役割別タスク（YAML）
-│  │  ├─ commands/          # 家老→足軽 指示（YAML）
+│  │  ├─ commands/          # ディスパッチャー→エージェント 指示（YAML）
 │  │  └─ reports/           # 役割別レポート（YAML）
 │  └─ logs/                 # 役割別ログ
 ├─ scripts/
@@ -149,18 +149,18 @@ MonochromeMemory.CodexMultiAgent/
 ### roles.yaml（例）
 ```yaml
 roles:
-  - id: shogun
-    name: "将軍"
-    prompt_path: "roles/shogun.md"
+  - id: orchestrator
+    name: "オーケストレーター"
+    prompt_path: "roles/orchestrator.md"
     enabled: true
     command:
       exec: "codex"
       args: []
       env: {}
       cwd: "."
-  - id: ashigaru1
-    name: "足軽1"
-    prompt_path: "roles/ashigaru1.md"
+  - id: agent1
+    name: "エージェント1"
+    prompt_path: "roles/agent1.md"
     enabled: true
     command:
       exec: "claude"
@@ -256,15 +256,15 @@ CREATE TABLE skills (
 3. `runtime/queue/tasks/<role>.yaml` を生成
 4. PTY へ「タスクファイルを読め」と入力送信
 
-### 2.1) 家老→足軽 指示フロー（YAML方式）
-1. 家老は `runtime/queue/commands/karo.yaml` に指示を記入
+### 2.1) ディスパッチャー→エージェント 指示フロー（YAML方式）
+1. ディスパッチャーは `runtime/queue/commands/dispatcher.yaml` に指示を記入
 2. Orchestrator が FileSystemWatcher で検知
-3. Orchestrator が `runtime/queue/tasks/ashigaruX.yaml` を生成
-4. 対象足軽の PTY へ「タスクファイルを読め」と入力送信
+3. Orchestrator が `runtime/queue/tasks/agentX.yaml` を生成
+4. 対象エージェントの PTY へ「タスクファイルを読め」と入力送信
 
-### 2.2) 家老へのスキル作成指示（YAML方式）
-1. Orchestrator が `runtime/queue/commands/karo.yaml` にスキル作成を追記
-2. 家老が `skills/registry/<skill-name>/SKILL.md` を作成
+### 2.2) ディスパッチャーへのスキル作成指示（YAML方式）
+1. Orchestrator が `runtime/queue/commands/dispatcher.yaml` にスキル作成を追記
+2. ディスパッチャーが `skills/registry/<skill-name>/SKILL.md` を作成
 3. Orchestrator が `~/.codex/skills/` と `~/.copilot/skills/` にコピー
 
 ### 3) 進捗・ログ表示
