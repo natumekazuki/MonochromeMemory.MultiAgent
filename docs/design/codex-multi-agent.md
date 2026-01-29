@@ -87,6 +87,7 @@ MonochromeMemory.CodexMultiAgent/
 ├─ runtime/
 │  ├─ queue/
 │  │  ├─ tasks/             # 役割別タスク（YAML）
+│  │  ├─ commands/          # 家老→足軽 指示（YAML）
 │  │  └─ reports/           # 役割別レポート（YAML）
 │  └─ logs/                 # 役割別ログ
 ├─ scripts/
@@ -172,6 +173,12 @@ CREATE TABLE logs (
 2. SQLite に保存
 3. `runtime/queue/tasks/<role>.yaml` を生成
 4. PTY へ「タスクファイルを読め」と入力送信
+
+### 2.1) 家老→足軽 指示フロー（YAML方式）
+1. 家老は `runtime/queue/commands/karo.yaml` に指示を記入
+2. Orchestrator が FileSystemWatcher で検知
+3. Orchestrator が `runtime/queue/tasks/ashigaruX.yaml` を生成
+4. 対象足軽の PTY へ「タスクファイルを読め」と入力送信
 
 ### 3) 進捗・ログ表示
 - `runtime/logs/*.log` を UI から参照
