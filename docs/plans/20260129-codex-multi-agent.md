@@ -21,7 +21,7 @@ WindowsのPowerShellから扱いやすく、任意のCLIコーディングエー
 - [x] `docs/design/codex-multi-agent.md` を作成（アーキテクチャ、フロー、DBスキーマ）
 - [x] `MonochromeMemory.CodexMultiAgent/` のベース構成を作成（README, config, scripts の雛形）
 - [x] MAUI Blazor アプリ基盤の作成（UI + API + データアクセス）
-- [ ] ConPTY を使ったセッション管理設計（ライブラリ方針決定）
+- [x] ConPTY を使ったセッション管理設計（ライブラリ方針決定）
 - [ ] Windows Terminal 連携（任意）の設計
 - [x] SQLite スキーマ設計（役割、タスク、実行履歴、ログ）
 - [ ] MAUI UI の最低限画面設計（役割管理 / 起動停止 / タスク投入 / 進捗 / 履歴）

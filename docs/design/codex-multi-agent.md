@@ -70,6 +70,16 @@ flowchart LR
 - タスク投入時に PTY へ入力を書き込む
 - ログを `runtime/logs/*.log` に保存
 
+## ConPTY 実装方針（ベストプラクティス）
+- ConPTY は Win32 API を直接呼び出す（P/Invoke）
+- Windows Terminal のサンプル（GUIConsole.ConPTY / EchoCon）を参照し、以下の基本手順を踏襲する
+  1. 入出力パイプを作成
+  2. `CreatePseudoConsole` で PTY を作成
+  3. `STARTUPINFOEX` + `PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE` で子プロセスを接続
+  4. 出力パイプを非同期で読み続ける
+- `PSEUDOCONSOLE_INHERIT_CURSOR` は原則使わない（使用時は非同期でカーソル応答が必要）
+- `ClosePseudoConsole` 前後は出力パイプを閉じるか読み続け、デッドロックを回避する
+
 ## Windows Terminal 連携の位置づけ
 - 主経路は MAUI UI のターミナル表示
 - Windows Terminal 連携は補助的（監視や手動操作向け）
