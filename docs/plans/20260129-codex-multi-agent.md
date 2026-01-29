@@ -47,3 +47,4 @@ WindowsのPowerShellから扱いやすく、任意のCLIコーディングエー
 - 2026-01-29: WSL前提を撤回し、Windowsネイティブ（PowerShell）前提に変更。TTY必須のため ConPTY を採用し、Windows Terminal 連携は補助機能として検討する。
 - 2026-01-29: UI を Svelte から MAUI Blazor へ切り替え。OSは Windows 11 前提、配布は EXE 生成までをスコープに変更。
 - 2026-01-29: Codex 前提を撤回し、任意CLIコマンドを役割ごとに設定する方針に変更。
+- 2026-01-29: スキル候補はエージェント報告に由来し、アプリ側の自動生成は行わない方針に変更。

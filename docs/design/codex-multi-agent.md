@@ -88,16 +88,19 @@ flowchart LR
 - 連携方式は `wt.exe` で新規タブを開き、ログを tail する等
 - PTY と Windows Terminal の完全同期は対象外
 
-## スキル自動生成（Codex/Copilot 対応）
+## スキル候補フロー（参考実装踏襲）
 ### 目的
-- タスク履歴から反復パターンを検出し、スキル候補を自動生成する
-- ユーザー承認後に Codex/Copilot のスキル形式で出力する
+- スキル候補はエージェントが報告に記載する（アプリ側で自動生成しない）
+- ユーザー承認後に、家老が SKILL.md を作成して正本へ保存する
+- 正本を Codex/Copilot の個人用ディレクトリへコピーする
 
 ### フロー
-1. タスク履歴を SQLite に蓄積
-2. 一定回数以上の反復を検出して `skill_candidates` を生成
-3. UI で候補を承認/却下
-4. 承認された候補をターゲット別にエクスポート（Codex/Copilot）
+1. 足軽は `runtime/queue/reports/<role>.yaml` に `skill_candidate` を記載
+2. Orchestrator が報告を収集し、UI に「候補」として表示
+3. ユーザーが承認/却下
+4. 承認時に Orchestrator が `runtime/queue/commands/karo.yaml` に「スキル作成」を指示
+5. 家老が `skills/registry/<skill-name>/SKILL.md` を作成
+6. Orchestrator が Codex/Copilot 個人用ディレクトリへコピー
 
 ### 形式（ターゲット別）
 **Codex / Copilot 共通の Markdown + Front Matter** を採用する。
@@ -117,9 +120,8 @@ description: このスキルの説明（いつ使うか、何をするか）
 - Codex: `~/.codex/skills/{skill-name}` へコピー
 - Copilot（個人用）: `~/.copilot/skills/{skill-name}` へコピー
 
-### 最小の検出ルール（初期）
-- 同一ロールで同一タイトル/タグが一定回数（例: 2回以上）
-- 類似度閾値（将来的に設定で調整可能）
+### 候補のソース
+- 報告ファイル内の `skill_candidate` のみを対象とする
 
 ## ディレクトリ構成（新規）
 ```
@@ -259,6 +261,11 @@ CREATE TABLE skills (
 2. Orchestrator が FileSystemWatcher で検知
 3. Orchestrator が `runtime/queue/tasks/ashigaruX.yaml` を生成
 4. 対象足軽の PTY へ「タスクファイルを読め」と入力送信
+
+### 2.2) 家老へのスキル作成指示（YAML方式）
+1. Orchestrator が `runtime/queue/commands/karo.yaml` にスキル作成を追記
+2. 家老が `skills/registry/<skill-name>/SKILL.md` を作成
+3. Orchestrator が `~/.codex/skills/` と `~/.copilot/skills/` にコピー
 
 ### 3) 進捗・ログ表示
 - `runtime/logs/*.log` を UI から参照
