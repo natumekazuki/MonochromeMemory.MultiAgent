@@ -1,10 +1,10 @@
-# Codex向けマルチエージェント基盤 設計（Windowsネイティブ + Svelte）
+# Codex向けマルチエージェント基盤 設計（Windowsネイティブ / MAUI Blazor）
 
 ## 目的
 - Windows（PowerShell）から操作可能なマルチエージェント基盤を構築する
 - Codex CLI（`codex`）を複数起動し、役割ごとに並列実行できる
 - 役割定義を `config/roles.yaml` + 役割ファイルでユーザーが自由に追加/編集できる
-- ローカル Web UI（Svelte）で「役割管理・起動/停止・タスク投入・ログ/進捗/履歴」を提供する
+- MAUI Blazor UI で「役割管理・起動/停止・タスク投入・ログ/進捗/履歴」を提供する
 - データは SQLite に永続化する
 
 ## 非目的
@@ -15,70 +15,71 @@
 ## 前提
 - Codex CLI は TTY 必須
 - 見えるターミナルが必要
-- Windows Terminal 連携は可能なら組み込み（補助的機能）
+- Windows 11 前提
+- Windows Terminal 連携は任意（補助的機能）
 
 ## 全体アーキテクチャ
 ```mermaid
 flowchart LR
   subgraph Windows
-    UI[Svelte UI]
-    API[SvelteKit API]
+    UI[MAUI Blazor UI]
+    ORCH[Orchestrator Service]
     DB[(SQLite)]
     CFG[config/roles.yaml + roles/*.md]
-    PTY[PTY Manager (node-pty/ConPTY)]
-    WT[Windows Terminal (optional)]
+    PTY[ConPTY Manager]
     AG1[Codex Agent 1]
     AGN[Codex Agent N]
     QUEUE[queue/tasks/*.yaml]
     REPORT[queue/reports/*.yaml]
     LOGS[logs/*.log]
+    WT[Windows Terminal (optional)]
   end
 
-  UI <--> API
-  API <--> DB
-  API <--> CFG
-  API <--> PTY
+  UI <--> ORCH
+  ORCH <--> DB
+  ORCH <--> CFG
+  ORCH <--> PTY
   PTY --> AG1
   PTY --> AGN
-  API <--> QUEUE
-  API <--> REPORT
-  API <--> LOGS
-  API -. optional .-> WT
+  ORCH <--> QUEUE
+  ORCH <--> REPORT
+  ORCH <--> LOGS
+  ORCH -. optional .-> WT
 ```
 
 ## コンポーネント
 
-### 1) Web UI（Svelte）
+### 1) MAUI Blazor UI
 - 役割管理（作成/編集/削除/有効化）
-- 起動/停止（PTY セッション管理）
+- 起動/停止（セッション管理）
 - タスク投入（役割単位に割り当て）
 - 進捗表示（タスク/役割の状態、最新ログ）
 - 履歴表示（過去タスク、実行ログ）
-- ターミナル表示（Web 上で PTY 出力を表示）
+- ターミナル表示（ConPTY 出力をウィンドウで表示）
 
-### 2) API/オーケストレーター（SvelteKit サーバー）
-- node-pty/ConPTY で `codex` を PTY 配下で起動
+### 2) Orchestrator Service（アプリ内）
+- ConPTY を使って `codex` を PTY 配下で起動
 - 役割設定の読込・検証・永続化
 - タスク作成、キュー生成、進捗/履歴管理
 - SQLite への保存
-- Windows Terminal 連携（任意）: 監視用タブを開くなど
+- Windows Terminal 連携（任意）
 
-### 3) PTY セッション管理（node-pty/ConPTY）
+### 3) ConPTY セッション管理
 - 役割ごとに PTY セッションを作成
-- Web UI へストリーム配信
+- UI へストリーム配信
 - タスク投入時に PTY へ入力を書き込む
 - ログを `runtime/logs/*.log` に保存
 
 ## Windows Terminal 連携の位置づけ
-- 主経路は Web UI のターミナル表示
+- 主経路は MAUI UI のターミナル表示
 - Windows Terminal 連携は補助的（監視や手動操作向け）
 - 連携方式は `wt.exe` で新規タブを開き、ログを tail する等
-- PTY と Windows Terminal を完全同期する設計は対象外
+- PTY と Windows Terminal の完全同期は対象外
 
 ## ディレクトリ構成（新規）
 ```
 MonochromeMemory.CodexMultiAgent/
-├─ app/                    # SvelteKit (UI + API)
+├─ app/                    # MAUI Blazor App
 ├─ config/
 │  ├─ settings.yaml         # Windows/PTY/DB/UI 設定
 │  └─ roles.yaml            # 役割一覧
@@ -162,13 +163,13 @@ CREATE TABLE logs (
 
 ### 1) 起動
 1. PowerShell から `scripts/start.ps1` を実行
-2. API サーバー起動（SvelteKit）
+2. MAUI アプリ起動
 3. 役割数に応じて PTY セッションを作成し `codex` を起動
 4. 役割指示書を読み込むよう初期入力
 
 ### 2) タスク投入
 1. UI で役割とタスク内容を選択
-2. API が SQLite に保存
+2. SQLite に保存
 3. `runtime/queue/tasks/<role>.yaml` を生成
 4. PTY へ「タスクファイルを読め」と入力送信
 
@@ -179,7 +180,7 @@ CREATE TABLE logs (
 ## 設定ファイル（settings.yaml 例）
 ```yaml
 pty:
-  backend: "conpty"  # node-pty backend
+  backend: "conpty"
 
 codex:
   command: "codex"
