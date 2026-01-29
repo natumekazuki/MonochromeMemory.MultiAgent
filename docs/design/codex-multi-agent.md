@@ -32,6 +32,7 @@ flowchart LR
     QUEUE[queue/tasks/*.yaml]
     REPORT[queue/reports/*.yaml]
     LOGS[logs/*.log]
+    SKILL[skills/*.md]
     WT[Windows Terminal (optional)]
   end
 
@@ -44,6 +45,7 @@ flowchart LR
   ORCH <--> QUEUE
   ORCH <--> REPORT
   ORCH <--> LOGS
+  ORCH <--> SKILL
   ORCH -. optional .-> WT
 ```
 
@@ -86,6 +88,38 @@ flowchart LR
 - 連携方式は `wt.exe` で新規タブを開き、ログを tail する等
 - PTY と Windows Terminal の完全同期は対象外
 
+## スキル自動生成（Codex/Copilot 対応）
+### 目的
+- タスク履歴から反復パターンを検出し、スキル候補を自動生成する
+- ユーザー承認後に Codex/Copilot のスキル形式で出力する
+
+### フロー
+1. タスク履歴を SQLite に蓄積
+2. 一定回数以上の反復を検出して `skill_candidates` を生成
+3. UI で候補を承認/却下
+4. 承認された候補をターゲット別にエクスポート（Codex/Copilot）
+
+### 形式（ターゲット別）
+**Codex / Copilot 共通の Markdown + Front Matter** を採用する。
+
+```markdown
+---
+name: skill-name
+description: このスキルの説明（いつ使うか、何をするか）
+---
+
+# 本文
+ここに実際の指示を書く
+```
+
+### エクスポート先（例）
+- Codex: `skills/codex/{skill-name}.md`
+- Copilot: `skills/copilot/{skill-name}.md`
+
+### 最小の検出ルール（初期）
+- 同一ロールで同一タイトル/タグが一定回数（例: 2回以上）
+- 類似度閾値（将来的に設定で調整可能）
+
 ## ディレクトリ構成（新規）
 ```
 MonochromeMemory.CodexMultiAgent/
@@ -94,6 +128,9 @@ MonochromeMemory.CodexMultiAgent/
 │  ├─ settings.yaml         # Windows/PTY/DB/UI 設定
 │  └─ roles.yaml            # 役割一覧
 ├─ roles/                   # 役割ファイル（Markdown）
+├─ skills/
+│  ├─ codex/                # Codex向けスキル出力
+│  └─ copilot/              # Copilot向けスキル出力
 ├─ runtime/
 │  ├─ queue/
 │  │  ├─ tasks/             # 役割別タスク（YAML）
@@ -178,6 +215,29 @@ CREATE TABLE logs (
   FOREIGN KEY(run_id) REFERENCES runs(id),
   FOREIGN KEY(role_id) REFERENCES roles(id)
 );
+
+-- スキル候補
+CREATE TABLE skill_candidates (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  description TEXT NOT NULL,
+  body TEXT NOT NULL,
+  source_task_ids TEXT NOT NULL,
+  status TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+-- スキル（エクスポート済み）
+CREATE TABLE skills (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  description TEXT NOT NULL,
+  body TEXT NOT NULL,
+  target TEXT NOT NULL,
+  path TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
 ```
 
 ## 主要フロー
@@ -226,6 +286,12 @@ data:
 terminal:
   windows_terminal:
     enabled: true
+
+skills:
+  enabled: true
+  codex_path: "skills/codex"
+  copilot_path: "skills/copilot"
+  auto_candidate_threshold: 2
 ```
 
 ## 仕様上の制約

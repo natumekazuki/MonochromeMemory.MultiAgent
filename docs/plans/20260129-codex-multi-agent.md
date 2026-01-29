@@ -25,6 +25,8 @@ WindowsのPowerShellから扱いやすく、任意のCLIコーディングエー
 - [x] ConPTY ラッパー実装（P/Invoke ベースの基礎）
 - [x] MAUI アプリを Windows 11 専用ターゲットへ調整
 - [ ] Windows Terminal 連携（任意）の設計
+- [ ] スキル候補の自動生成フロー設計（Codex/Copilot）
+- [ ] スキル出力（Codex/Copilot）フォーマットと保存先の実装
 - [x] SQLite スキーマ設計（役割、タスク、実行履歴、ログ）
 - [ ] MAUI UI の最低限画面設計（役割管理 / 起動停止 / タスク投入 / 進捗 / 履歴）
 - [ ] 実装手順と運用フローのドキュメント化
