@@ -39,7 +39,8 @@ roles:
 - ログ: `runtime/logs/`
 
 ## スキル
-- 出力先: `skills/codex/`, `skills/copilot/`
+- 正本: `skills/registry/<skill-name>/SKILL.md`
+- 連携先: `~/.codex/skills/` と `~/.copilot/skills/`（シンボリックリンク、不可ならコピー）
 - 形式: Markdown + Front Matter
 
 ```markdown
