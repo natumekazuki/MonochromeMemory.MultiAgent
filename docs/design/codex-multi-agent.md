@@ -1,29 +1,32 @@
-# Codex向けマルチエージェント基盤 設計（WSL + tmux + Svelte）
+# Codex向けマルチエージェント基盤 設計（Windowsネイティブ + Svelte）
 
 ## 目的
-- Windows（PowerShell）から **WSL 経由で** 操作可能なマルチエージェント基盤を構築する
+- Windows（PowerShell）から操作可能なマルチエージェント基盤を構築する
 - Codex CLI（`codex`）を複数起動し、役割ごとに並列実行できる
 - 役割定義を `config/roles.yaml` + 役割ファイルでユーザーが自由に追加/編集できる
 - ローカル Web UI（Svelte）で「役割管理・起動/停止・タスク投入・ログ/進捗/履歴」を提供する
 - データは SQLite に永続化する
 
 ## 非目的
-- Windows Terminal のタブ/ペイン自動生成（対象外）
+- WSL/tmux 依存の運用
 - Codex CLI の拡張オプション依存（`codex` コマンドのみ前提）
 - クラウド配布やマルチユーザー運用
+
+## 前提
+- Codex CLI は TTY 必須
+- 見えるターミナルが必要
+- Windows Terminal 連携は可能なら組み込み（補助的機能）
 
 ## 全体アーキテクチャ
 ```mermaid
 flowchart LR
   subgraph Windows
     UI[Svelte UI]
-    API[Node/SvelteKit API]
+    API[SvelteKit API]
     DB[(SQLite)]
     CFG[config/roles.yaml + roles/*.md]
-  end
-
-  subgraph WSL
-    TMUX[tmux session]
+    PTY[PTY Manager (node-pty/ConPTY)]
+    WT[Windows Terminal (optional)]
     AG1[Codex Agent 1]
     AGN[Codex Agent N]
     QUEUE[queue/tasks/*.yaml]
@@ -34,40 +37,50 @@ flowchart LR
   UI <--> API
   API <--> DB
   API <--> CFG
-  API -->|wsl.exe| TMUX
-  TMUX --> AG1
-  TMUX --> AGN
+  API <--> PTY
+  PTY --> AG1
+  PTY --> AGN
   API <--> QUEUE
   API <--> REPORT
   API <--> LOGS
+  API -. optional .-> WT
 ```
 
 ## コンポーネント
 
 ### 1) Web UI（Svelte）
 - 役割管理（作成/編集/削除/有効化）
-- 起動/停止（tmux セッション操作）
+- 起動/停止（PTY セッション管理）
 - タスク投入（役割単位に割り当て）
 - 進捗表示（タスク/役割の状態、最新ログ）
 - 履歴表示（過去タスク、実行ログ）
+- ターミナル表示（Web 上で PTY 出力を表示）
 
 ### 2) API/オーケストレーター（SvelteKit サーバー）
-- `wsl.exe` 経由で tmux/WSL コマンドを実行
+- node-pty/ConPTY で `codex` を PTY 配下で起動
 - 役割設定の読込・検証・永続化
 - タスク作成、キュー生成、進捗/履歴管理
 - SQLite への保存
+- Windows Terminal 連携（任意）: 監視用タブを開くなど
 
-### 3) 実行基盤（WSL + tmux）
-- tmux セッションに役割ごとのエージェントを配置
-- `codex` を各エージェントとして起動
-- タスクは `queue/tasks/<role>.yaml` に書き込み、tmux send-keys で通知
+### 3) PTY セッション管理（node-pty/ConPTY）
+- 役割ごとに PTY セッションを作成
+- Web UI へストリーム配信
+- タスク投入時に PTY へ入力を書き込む
+- ログを `runtime/logs/*.log` に保存
+
+## Windows Terminal 連携の位置づけ
+- 主経路は Web UI のターミナル表示
+- Windows Terminal 連携は補助的（監視や手動操作向け）
+- 連携方式は `wt.exe` で新規タブを開き、ログを tail する等
+- PTY と Windows Terminal を完全同期する設計は対象外
 
 ## ディレクトリ構成（新規）
 ```
 MonochromeMemory.CodexMultiAgent/
 ├─ app/                    # SvelteKit (UI + API)
 ├─ config/
-│  ├─ settings.yaml         # WSL/tmux/DB/UI 設定
+│  ├─ settings.yaml         # Windows/PTY/DB/UI 設定
 │  └─ roles.yaml            # 役割一覧
 ├─ roles/                   # 役割ファイル（Markdown）
 ├─ runtime/
@@ -77,7 +90,7 @@ MonochromeMemory.CodexMultiAgent/
 │  └─ logs/                 # 役割別ログ
 ├─ scripts/
 │  ├─ start.ps1             # PowerShell 起動スクリプト
-│  └─ wsl.sh                # WSL 内ユーティリティ
+│  └─ terminal.ps1          # Windows Terminal 連携（任意）
 └─ README.md
 ```
 
@@ -150,15 +163,14 @@ CREATE TABLE logs (
 ### 1) 起動
 1. PowerShell から `scripts/start.ps1` を実行
 2. API サーバー起動（SvelteKit）
-3. `wsl.exe` 経由で tmux セッション作成
-4. 役割数に応じて tmux ウィンドウを作成し `codex` を起動
-5. 各ウィンドウに役割指示書を読み込むよう send-keys
+3. 役割数に応じて PTY セッションを作成し `codex` を起動
+4. 役割指示書を読み込むよう初期入力
 
 ### 2) タスク投入
 1. UI で役割とタスク内容を選択
 2. API が SQLite に保存
 3. `runtime/queue/tasks/<role>.yaml` を生成
-4. tmux send-keys で「タスクファイルを読め」と通知
+4. PTY へ「タスクファイルを読め」と入力送信
 
 ### 3) 進捗・ログ表示
 - `runtime/logs/*.log` を UI から参照
@@ -166,15 +178,12 @@ CREATE TABLE logs (
 
 ## 設定ファイル（settings.yaml 例）
 ```yaml
-wsl:
-  distro: "Ubuntu"
-  root_path: "/home/<user>/codex-multi-agent"
-
-tmux:
-  session: "codex-agents"
+pty:
+  backend: "conpty"  # node-pty backend
 
 codex:
   command: "codex"
+  cwd: "."
 
 ui:
   host: "localhost"
@@ -182,9 +191,13 @@ ui:
 
 data:
   sqlite_path: "data/app.db"
+
+terminal:
+  windows_terminal:
+    enabled: true
 ```
 
 ## 仕様上の制約
-- Windows Terminal 連携は対象外
+- PTY 管理が主経路であり、Windows Terminal 連携は補助
 - `codex` の起動オプションは固定せず、プロンプト指示で役割を浸透させる
-- WSL + tmux を前提とするため、導入手順は README で明示する
+- Windows 環境差異により PTY の互換性に注意が必要
