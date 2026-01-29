@@ -1,19 +1,19 @@
-# Codex向けマルチエージェント基盤 設計（Windowsネイティブ / MAUI Blazor）
+# CLIマルチエージェント基盤 設計（Windowsネイティブ / MAUI Blazor）
 
 ## 目的
 - Windows（PowerShell）から操作可能なマルチエージェント基盤を構築する
-- Codex CLI（`codex`）を複数起動し、役割ごとに並列実行できる
+- 任意のCLIエージェントを複数起動し、役割ごとに並列実行できる
 - 役割定義を `config/roles.yaml` + 役割ファイルでユーザーが自由に追加/編集できる
 - MAUI Blazor UI で「役割管理・起動/停止・タスク投入・ログ/進捗/履歴」を提供する
 - データは SQLite に永続化する
 
 ## 非目的
 - WSL/tmux 依存の運用
-- Codex CLI の拡張オプション依存（`codex` コマンドのみ前提）
+- 特定CLIの専用拡張に依存する運用
 - クラウド配布やマルチユーザー運用
 
 ## 前提
-- Codex CLI は TTY 必須
+- 対象CLIはTTY対応（TTY必須のケースを想定）
 - 見えるターミナルが必要
 - Windows 11 前提
 - Windows Terminal 連携は任意（補助的機能）
@@ -27,8 +27,8 @@ flowchart LR
     DB[(SQLite)]
     CFG[config/roles.yaml + roles/*.md]
     PTY[ConPTY Manager]
-    AG1[Codex Agent 1]
-    AGN[Codex Agent N]
+    AG1[Agent 1]
+    AGN[Agent N]
     QUEUE[queue/tasks/*.yaml]
     REPORT[queue/reports/*.yaml]
     LOGS[logs/*.log]
@@ -58,7 +58,7 @@ flowchart LR
 - ターミナル表示（ConPTY 出力をウィンドウで表示）
 
 ### 2) Orchestrator Service（アプリ内）
-- ConPTY を使って `codex` を PTY 配下で起動
+- ConPTY を使って 役割ごとのコマンド を PTY 配下で起動
 - 役割設定の読込・検証・永続化
 - タスク作成、キュー生成、進捗/履歴管理
 - SQLite への保存
@@ -104,10 +104,20 @@ roles:
     name: "将軍"
     prompt_path: "roles/shogun.md"
     enabled: true
+    command:
+      exec: "codex"
+      args: []
+      env: {}
+      cwd: "."
   - id: ashigaru1
     name: "足軽1"
     prompt_path: "roles/ashigaru1.md"
     enabled: true
+    command:
+      exec: "claude"
+      args: ["--dangerously-skip-permissions"]
+      env: {}
+      cwd: "."
 ```
 
 ### 役割ファイル
@@ -165,7 +175,7 @@ CREATE TABLE logs (
 ### 1) 起動
 1. PowerShell から `scripts/start.ps1` を実行
 2. MAUI アプリ起動
-3. 役割数に応じて PTY セッションを作成し `codex` を起動
+3. 役割数に応じて PTY セッションを作成し、役割コマンドを起動
 4. 役割指示書を読み込むよう初期入力
 
 ### 2) タスク投入
@@ -189,9 +199,12 @@ CREATE TABLE logs (
 pty:
   backend: "conpty"
 
-codex:
-  command: "codex"
-  cwd: "."
+agent:
+  default_command:
+    exec: "codex"
+    args: []
+    env: {}
+    cwd: "."
 
 ui:
   host: "localhost"
@@ -207,5 +220,5 @@ terminal:
 
 ## 仕様上の制約
 - PTY 管理が主経路であり、Windows Terminal 連携は補助
-- `codex` の起動オプションは固定せず、プロンプト指示で役割を浸透させる
+- CLIの起動オプションは固定せず、役割ファイルの初期指示で役割を浸透させる
 - Windows 環境差異により PTY の互換性に注意が必要

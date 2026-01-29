@@ -1,0 +1,30 @@
+# CLIマルチエージェント設定
+
+app:
+  name: "MonochromeMemory.CodexMultiAgent"
+
+ui:
+  mode: "maui-blazor"
+
+pty:
+  backend: "conpty"
+
+runtime:
+  queue_path: "runtime/queue"
+  logs_path: "runtime/logs"
+
+data:
+  sqlite_path: "data/app.db"
+
+terminal:
+  windows_terminal:
+    enabled: false
+    profile: null
+
+agent:
+  # 役割ごとの command が未指定の場合の既定
+  default_command:
+    exec: "codex"
+    args: []
+    env: {}
+    cwd: "."

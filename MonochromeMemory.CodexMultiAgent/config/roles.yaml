@@ -1,0 +1,30 @@
+roles:
+  - id: shogun
+    name: "将軍"
+    prompt_path: "roles/shogun.md"
+    enabled: true
+    command:
+      exec: "codex"
+      args: []
+      env: {}
+      cwd: "."
+
+  - id: karo
+    name: "家老"
+    prompt_path: "roles/karo.md"
+    enabled: true
+    command:
+      exec: "claude"
+      args: ["--dangerously-skip-permissions"]
+      env: {}
+      cwd: "."
+
+  - id: ashigaru1
+    name: "足軽1"
+    prompt_path: "roles/ashigaru1.md"
+    enabled: true
+    command:
+      exec: "gemini"
+      args: []
+      env: {}
+      cwd: "."

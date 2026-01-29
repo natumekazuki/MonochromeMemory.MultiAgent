@@ -1,0 +1,9 @@
+﻿namespace CodexMultiAgent.App;
+
+public partial class MainPage : ContentPage
+{
+	public MainPage()
+	{
+		InitializeComponent();
+	}
+}
