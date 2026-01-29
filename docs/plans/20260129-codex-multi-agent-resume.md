@@ -44,9 +44,9 @@
 - スキル連携のコピー処理実装（正本 → Codex/Copilot 個人用）
 - `runtime/queue/commands/dispatcher.yaml` のスキル作成指示フォーマット確定
 - Windows Terminal 連携（任意）
+- アプリ名/Namespace のリネーム（CodexMultiAgent.App → MultiAgent.App）
 
 ## 次回最初に確認すべきこと
 - `docs/design/codex-multi-agent.md` の内容と最新整合
 - 役割 ID/ファイル名の整合（orchestrator/dispatcher/agent1）
 - ConPTY ラッパーの起動テスト（簡易起動サンプル）
-
