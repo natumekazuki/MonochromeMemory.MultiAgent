@@ -1,7 +1,7 @@
 # Codex向けマルチエージェント基盤 設計（WSL + tmux + Svelte）
 
 ## 目的
-- Windows（PowerShell）から操作可能なマルチエージェント基盤を構築する
+- Windows（PowerShell）から **WSL 経由で** 操作可能なマルチエージェント基盤を構築する
 - Codex CLI（`codex`）を複数起動し、役割ごとに並列実行できる
 - 役割定義を `config/roles.yaml` + 役割ファイルでユーザーが自由に追加/編集できる
 - ローカル Web UI（Svelte）で「役割管理・起動/停止・タスク投入・ログ/進捗/履歴」を提供する
