@@ -15,8 +15,8 @@ WindowsのPowerShellから扱いやすく、Codex CLI を複数起動・統率�
 - **Windows Terminal 連携**: 対象外（WSL + tmux で運用）
 
 ## Task List
-- [ ] プロジェクト構成案を設計（ディレクトリ構成、設定ファイル配置）
-- [ ] `docs/design/codex-multi-agent.md` を作成（アーキテクチャ、フロー、DBスキーマ）
+- [x] プロジェクト構成案を設計（ディレクトリ構成、設定ファイル配置）
+- [x] `docs/design/codex-multi-agent.md` を作成（アーキテクチャ、フロー、DBスキーマ）
 - [ ] `MonochromeMemory.CodexMultiAgent/` のベース構成を作成（README, config, scripts の雛形）
 - [ ] WSL + tmux 制御の基本スクリプト設計（PowerShell → wsl.exe）
 - [ ] SQLite スキーマ設計（役割、タスク、実行履歴、ログ）
