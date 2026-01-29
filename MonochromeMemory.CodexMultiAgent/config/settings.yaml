@@ -28,3 +28,9 @@ agent:
     args: []
     env: {}
     cwd: "."
+
+skills:
+  enabled: true
+  codex_path: "skills/codex"
+  copilot_path: "skills/copilot"
+  auto_candidate_threshold: 2

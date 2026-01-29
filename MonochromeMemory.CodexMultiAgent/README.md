@@ -38,6 +38,20 @@ roles:
 - 報告: `runtime/queue/reports/*.yaml`
 - ログ: `runtime/logs/`
 
+## スキル
+- 出力先: `skills/codex/`, `skills/copilot/`
+- 形式: Markdown + Front Matter
+
+```markdown
+---
+name: skill-name
+description: このスキルの説明（いつ使うか、何をするか）
+---
+
+# 本文
+ここに実際の指示を書く
+```
+
 ## 注意
 - TTY 必須の CLI を想定しています。
 - Windows Terminal 連携は任意機能です（`scripts/terminal.ps1` を編集）。
