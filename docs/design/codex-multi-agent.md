@@ -112,10 +112,10 @@ description: このスキルの説明（いつ使うか、何をするか）
 ここに実際の指示を書く
 ```
 
-### エクスポート先（正本 + 連携）
+### エクスポート先（正本 + コピー連携）
 - 正本: `skills/registry/{skill-name}/SKILL.md`
-- Codex: `~/.codex/skills/{skill-name}` へシンボリックリンク（不可ならコピー）
-- Copilot（個人用）: `~/.copilot/skills/{skill-name}` へシンボリックリンク（不可ならコピー）
+- Codex: `~/.codex/skills/{skill-name}` へコピー
+- Copilot（個人用）: `~/.copilot/skills/{skill-name}` へコピー
 
 ### 最小の検出ルール（初期）
 - 同一ロールで同一タイトル/タグが一定回数（例: 2回以上）
@@ -293,7 +293,7 @@ skills:
   codex_link_path: "~/.codex/skills"
   copilot_link_path: "~/.copilot/skills"
   auto_candidate_threshold: 2
-  link_fallback: "copy"
+  link_mode: "copy"
 ```
 
 ## 仕様上の制約

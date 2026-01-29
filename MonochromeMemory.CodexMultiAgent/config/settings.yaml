@@ -35,4 +35,4 @@ skills:
   codex_link_path: "~/.codex/skills"
   copilot_link_path: "~/.copilot/skills"
   auto_candidate_threshold: 2
-  link_fallback: "copy"
+  link_mode: "copy"
