@@ -1,7 +1,7 @@
 # CLIマルチエージェント設定
 
 app:
-  name: "MonochromeMemory.CodexMultiAgent"
+  name: "MonochromeMemory.MultiAgent"
 
 ui:
   mode: "maui-blazor"

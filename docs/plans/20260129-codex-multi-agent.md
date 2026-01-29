@@ -1,7 +1,7 @@
 # 計画: CLIマルチエージェント基盤（Windowsネイティブ / MAUI）
 
 ## Goal
-WindowsのPowerShellから扱いやすく、任意のCLIコーディングエージェントを複数起動・統率できる基盤を `MonochromeMemory.CodexMultiAgent/` に新規作成する。役割は `config/roles.yaml` で定義し、MAUI Blazor UI で編集・運用できる。
+WindowsのPowerShellから扱いやすく、任意のCLIコーディングエージェントを複数起動・統率できる基盤を `MonochromeMemory.MultiAgent/` に新規作成する。役割は `config/roles.yaml` で定義し、MAUI Blazor UI で編集・運用できる。
 
 ## Design Check
 - **Design Doc 必須**: はい（新機能・新アーキテクチャのため）
@@ -19,7 +19,7 @@ WindowsのPowerShellから扱いやすく、任意のCLIコーディングエー
 ## Task List
 - [x] プロジェクト構成案を設計（ディレクトリ構成、設定ファイル配置）
 - [x] `docs/design/codex-multi-agent.md` を作成（アーキテクチャ、フロー、DBスキーマ）
-- [x] `MonochromeMemory.CodexMultiAgent/` のベース構成を作成（README, config, scripts の雛形）
+- [x] `MonochromeMemory.MultiAgent/` のベース構成を作成（README, config, scripts の雛形）
 - [x] MAUI Blazor アプリ基盤の作成（UI + API + データアクセス）
 - [x] ConPTY を使ったセッション管理設計（ライブラリ方針決定）
 - [x] ConPTY ラッパー実装（P/Invoke ベースの基礎）
@@ -34,7 +34,7 @@ WindowsのPowerShellから扱いやすく、任意のCLIコーディングエー
 ## Affected Files
 - `docs/plans/20260129-codex-multi-agent.md`
 - `docs/design/codex-multi-agent.md`
-- `MonochromeMemory.CodexMultiAgent/` 以下一式（新規）
+- `MonochromeMemory.MultiAgent/` 以下一式（新規）
 
 ## Risks
 - ConPTY の互換性（Windows環境差異）
@@ -49,3 +49,4 @@ WindowsのPowerShellから扱いやすく、任意のCLIコーディングエー
 - 2026-01-29: Codex 前提を撤回し、任意CLIコマンドを役割ごとに設定する方針に変更。
 - 2026-01-29: スキル候補はエージェント報告に由来し、アプリ側の自動生成は行わない方針に変更。
 - 2026-01-29: 役割名称を一般化（将軍/家老/足軽 → オーケストレーター/ディスパッチャー/エージェント）。
+- 2026-01-29: ベースディレクトリ名を MonochromeMemory.MultiAgent に変更（Codex表記を除去）。

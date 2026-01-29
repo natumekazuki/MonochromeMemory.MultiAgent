@@ -1,5 +1,5 @@
 .DS_Store
 /multi-agent-shogun
-/MonochromeMemory.CodexMultiAgent/app/bin/
-/MonochromeMemory.CodexMultiAgent/app/obj/
-/MonochromeMemory.CodexMultiAgent/.vs/
+/MonochromeMemory.MultiAgent/app/bin/
+/MonochromeMemory.MultiAgent/app/obj/
+/MonochromeMemory.MultiAgent/.vs/

@@ -125,7 +125,7 @@ description: このスキルの説明（いつ使うか、何をするか）
 
 ## ディレクトリ構成（新規）
 ```
-MonochromeMemory.CodexMultiAgent/
+MonochromeMemory.MultiAgent/
 ├─ app/                    # MAUI Blazor App
 ├─ config/
 │  ├─ settings.yaml         # Windows/PTY/DB/UI 設定

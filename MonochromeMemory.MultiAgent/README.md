@@ -1,4 +1,4 @@
-# MonochromeMemory.CodexMultiAgent
+# MonochromeMemory.MultiAgent
 
 Windows ネイティブ（MAUI Blazor）で動作する、CLI コーディングエージェント向けのマルチエージェント基盤。
 役割は `config/roles.yaml` と `roles/*.md` で定義し、任意コマンドでエージェントを起動できます。

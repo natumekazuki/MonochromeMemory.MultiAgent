@@ -14,23 +14,23 @@
 - Windows Terminal 連携: 任意の補助機能（主経路は MAUI UI）
 
 ## 変更済みファイル・構成
-- MAUI 基盤: `MonochromeMemory.CodexMultiAgent/app/`
-- 役割設定: `MonochromeMemory.CodexMultiAgent/config/roles.yaml`
-- 設定: `MonochromeMemory.CodexMultiAgent/config/settings.yaml`
+- MAUI 基盤: `MonochromeMemory.MultiAgent/app/`
+- 役割設定: `MonochromeMemory.MultiAgent/config/roles.yaml`
+- 設定: `MonochromeMemory.MultiAgent/config/settings.yaml`
 - 役割ファイル:
-  - `MonochromeMemory.CodexMultiAgent/roles/orchestrator.md`
-  - `MonochromeMemory.CodexMultiAgent/roles/dispatcher.md`
-  - `MonochromeMemory.CodexMultiAgent/roles/agent1.md`
+  - `MonochromeMemory.MultiAgent/roles/orchestrator.md`
+  - `MonochromeMemory.MultiAgent/roles/dispatcher.md`
+  - `MonochromeMemory.MultiAgent/roles/agent1.md`
 - ランタイム YAML:
-  - `MonochromeMemory.CodexMultiAgent/runtime/queue/tasks/*.yaml`
-  - `MonochromeMemory.CodexMultiAgent/runtime/queue/reports/*.yaml`
-  - `MonochromeMemory.CodexMultiAgent/runtime/queue/commands/dispatcher.yaml`
-- スキル正本: `MonochromeMemory.CodexMultiAgent/skills/registry/`
+  - `MonochromeMemory.MultiAgent/runtime/queue/tasks/*.yaml`
+  - `MonochromeMemory.MultiAgent/runtime/queue/reports/*.yaml`
+  - `MonochromeMemory.MultiAgent/runtime/queue/commands/dispatcher.yaml`
+- スキル正本: `MonochromeMemory.MultiAgent/skills/registry/`
 - ConPTY ラッパー:
-  - `MonochromeMemory.CodexMultiAgent/app/Services/Pty/ConPtyNative.cs`
-  - `MonochromeMemory.CodexMultiAgent/app/Services/Pty/ConPtySession.cs`
-  - `MonochromeMemory.CodexMultiAgent/app/Services/Pty/CommandLineBuilder.cs`
-  - `MonochromeMemory.CodexMultiAgent/app/Services/Pty/PtyStartOptions.cs`
+  - `MonochromeMemory.MultiAgent/app/Services/Pty/ConPtyNative.cs`
+  - `MonochromeMemory.MultiAgent/app/Services/Pty/ConPtySession.cs`
+  - `MonochromeMemory.MultiAgent/app/Services/Pty/CommandLineBuilder.cs`
+  - `MonochromeMemory.MultiAgent/app/Services/Pty/PtyStartOptions.cs`
 
 ## 起動方法（開発）
 ```powershell
